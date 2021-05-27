@@ -11,9 +11,11 @@ int MPU_Address = 0x68; //mpu6050 칩의 I2C 주소
 int16_t Tmp;
 float tmp;
 
-void setup() {
-    
+void setup()
+{ 
   Serial.begin(115200);
+  delay(100);
+  
   Wire.begin(4,5);
   Wire.beginTransmission(MPU_Address);
   Wire.write(0x6B);
@@ -22,9 +24,8 @@ void setup() {
   i = Wire.read();
   Serial.print("0x");
   Serial.println(i,HEX);
-  delay(100);
 
-  WiFi.begin("","");
+  WiFi.begin(" "," ");
   while(WiFi.status() != WL_CONNECTED)
   {
     delay(100);
@@ -38,7 +39,8 @@ void setup() {
   Serial.println(" MQTT Connect: %d", PC);
 }
 
-void loop() {
+void loop()
+{
   // put your main code here, to run repeatedly:
 
 }
