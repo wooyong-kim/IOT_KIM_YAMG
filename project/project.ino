@@ -3,11 +3,14 @@
 #include <PubSubClient.h>
 #include <Wire.h>
 
+#define DELAY_MS  19000
+
 WiFiClient PJWC;
 HTTPClient PJHC;
 PubSubClient PJMC;
 
 int MPU_Address = 0x68; //mpu6050 칩의 I2C 주소
+int i = 1;
 int16_t Tmp;
 float tmp;
 
@@ -41,13 +44,36 @@ void setup()
 
 void loop()
 {
-  Wire.beginTransmission(MPU_Address);
-  Wire.write(0x3B);
-  Wire.endTransmission();
-
-  Wire.requestFrom(MPU_Address, 14 ,true);
-  Tmp = Wire.read() << 8 | Wire.read();
-  tmp = Tmp / 340.000 + 36.53
-  Serial.print(", Tmp = "); Serial.print(tmp);
+  if(millis() - lastMs >= DELAY_MS)
+  {
+    lastMs = millis();
+    Wire.beginTransmission(MPU_Address);
+    Wire.write(0x3B);
+    Wire.endTransmission();
   
+    Wire.requestFrom(MPU_Address, 14 ,true);
+    Tmp = Wire.read() << 8 | Wire.read();
+    tmp = Tmp / 340.000 + 36.53
+    Serial.print(", Tmp = "); Serial.print(tmp);
+
+    if(i == 0)
+    {
+      Serial.print("Tmp = "); Serial.println(Tmp / 340.000 + 36.53);
+      char Tmpbuffer[200];
+      snprintf(Tmpbuffer, sizeof(Tmpbuffer), "http://api.thingspeak.com/update?api_key=6S31S3WI6UO1EZE6&field1=%lf", Tmp / 340.000 + 36.53);
+      myClient.begin(Tmpbuffer);
+      myClient.GET();
+      myClient.getString();
+      myClient.end();
+      i = 1;
+    }
+    else
+    {
+      Serial.print("AZ = "); Serial.println(z);
+      char AcZbuffer[100];
+      snprintf(AcZbuffer, sizeof(AcZbuffer), "%lf", z);
+      myMQTTClient.publish("channels/1397244/publish/fields/field2/6S31S3WI6UO1EZE6", AcZbuffer);
+      i = 0;
+    }
+  }
 }
