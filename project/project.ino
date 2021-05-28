@@ -1,6 +1,7 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <PubSubClient.h>
+#include<ArduinoJson.h>
 #include <Wire.h>
 
 #define DELAY_MS  19000
@@ -52,7 +53,7 @@ void loop()
     Wire.endTransmission();
     delay(1000);
     
-    Wire.requestFrom(MPU_Address, 14 ,true);
+    Wire.requestFrom(MPU_Address, 2 ,true);
     Tmp = Wire.read() << 8 | Wire.read();
     tmp = Tmp / 340.000 + 36.53
     Serial.print(", Tmp = "); Serial.print(tmp);
