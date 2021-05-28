@@ -10,9 +10,9 @@ HTTPClient PJHC;
 PubSubClient PJMC;
 
 int MPU_Address = 0x68; //mpu6050 칩의 I2C 주소
-int i = 1;
 int16_t Tmp;
 float tmp;
+int i = 1;
 
 void setup()
 { 
@@ -58,13 +58,32 @@ void loop()
 
     if(i == 0)
     {
-      Serial.print("Tmp = "); Serial.println(Tmp / 340.000 + 36.53);
-      char Tmpbuffer[200];
-      snprintf(Tmpbuffer, sizeof(Tmpbuffer), "http://api.thingspeak.com/update?api_key=6S31S3WI6UO1EZE6&field1=%lf", Tmp / 340.000 + 36.53);
-      myClient.begin(Tmpbuffer);
-      myClient.GET();
-      myClient.getString();
-      myClient.end();
+      PJHC.begin("http://api.openweathermap.org/data/2.5/weather?q=yongin&appid=e749f72f517350b356969095ff56fd24");
+      int getResult = PJHC.GET();
+      if(getResult == HTTP_CODE_OK)
+      {
+        Serial.printf("site OK\n");
+        String receivedData = PJHC.getString();
+        //Serial.printf("receivedData : %s\r\n",receivedData.c_str());
+        deserializeJson(doc,receivedData);  // 해석 완료
+    
+        const char* city = doc["name"];
+        float temp = (float)doc["main"]["temp"]-273.0;
+        Serial.printf("도시 : %s\r\n",city);
+        Serial.printf("현재온도 : %.2f\r\n",temp);
+        
+        char Tmpbuffer[200];
+        snprintf(Tmpbuffer, sizeof(Tmpbuffer), "http://api.thingspeak.com/update?api_key=A5YIWO4Z2OZLAIGK&field2=%lf", temp);
+        PJHC.begin(Tmpbuffer);
+        PJHC.GET();
+        PJHC.getString();
+        PJHC.end();
+      }
+      else
+      {
+        Serial.printf("site ERR, code : %d\r\n",getResult);
+        return;
+      }
       i = 1;
     }
     else
@@ -72,7 +91,7 @@ void loop()
       Serial.print("AZ = "); Serial.println(z);
       char AcZbuffer[100];
       snprintf(AcZbuffer, sizeof(AcZbuffer), "%lf", z);
-      myMQTTClient.publish("channels/1397244/publish/fields/field2/6S31S3WI6UO1EZE6", AcZbuffer);
+      myMQTTClient.publish("channels/1397244/publish/fields/field2/6S31S3WI6UO1EZE6", tmp);
       i = 0;
     }
   }
