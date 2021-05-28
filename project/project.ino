@@ -1,18 +1,19 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <PubSubClient.h>
-#include<ArduinoJson.h>
+#include <ArduinoJson.h>
 #include <Wire.h>
 
-#define DELAY_MS  20000
+#define DELAY_MS  19000
 
 WiFiClient PJWC;
 HTTPClient PJHC;
 PubSubClient PJMC;
 
 int MPU_Address = 0x68; //mpu6050 칩의 I2C 주소
-int16_t Tmp, a ;
+int16_t Tmp;
 float tmp;
+unsigned long long lastMs = 0;
 int i = 1;
 
 void setup()
@@ -25,9 +26,9 @@ void setup()
   Wire.write(0x6B);
   Wire.write(1);
   Wire.endTransmission(true);
-  a = Wire.read();
+  i = Wire.read();
   Serial.print("0x");
-  Serial.println(a,HEX);
+  Serial.println(i,HEX);
 
   WiFi.begin(" "," ");
   while(WiFi.status() != WL_CONNECTED)
@@ -43,7 +44,7 @@ void setup()
   Serial.printf(" MQTT Connect: %d\r\n", PC);
 }
 
-unsigned long long lastMs = 0;
+unsigned long long lastMs;
 DynamicJsonDocument doc(2048);
 
 void loop()
@@ -54,11 +55,16 @@ void loop()
     Wire.beginTransmission(MPU_Address);
     Wire.write(0x3B);
     Wire.endTransmission();
+    delay(1000);
     
     Wire.requestFrom(MPU_Address, 2 ,true);
     Tmp = Wire.read() << 8 | Wire.read();
     tmp = Tmp / 340.000 + 36.53;
+<<<<<<< Updated upstream
     Serial.print(" Tmp = "); Serial.println(tmp);
+=======
+    Serial.print(", Tmp = "); Serial.print(tmp);
+>>>>>>> Stashed changes
 
     if(i == 0)
     {
@@ -91,9 +97,19 @@ void loop()
     }
     else
     {
+<<<<<<< Updated upstream
       char tempb[100];
       snprintf(tempb, sizeof(tempb), "%lf", tmp);
+<<<<<<< HEAD
       PJMC.publish("channels/1401138/publish/fields/field2/6S31S3WI6UO1EZE6", tempb);
+=======
+      PJMC.publish("channels/1401138/publish/fields/field2/6S31S3WI6UO1EZE6", tmp);
+=======
+      char tmpb[100];
+      snprintf(tmpb, sizeof(tmpb), "%lf", tmp);
+      PJMC.publish("channels/1397244/publish/fields/field2/6S31S3WI6UO1EZE6", tmp);
+>>>>>>> Stashed changes
+>>>>>>> 6438e9416877ef6558427f04a0ab71bda4ca38f0
       i = 0;
     }
   }
