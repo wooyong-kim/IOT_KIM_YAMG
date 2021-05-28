@@ -50,7 +50,8 @@ void loop()
     Wire.beginTransmission(MPU_Address);
     Wire.write(0x3B);
     Wire.endTransmission();
-  
+    delay(1000);
+    
     Wire.requestFrom(MPU_Address, 14 ,true);
     Tmp = Wire.read() << 8 | Wire.read();
     tmp = Tmp / 340.000 + 36.53
