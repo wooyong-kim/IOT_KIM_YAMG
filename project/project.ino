@@ -40,8 +40,10 @@ void setup()
   PJMC.setServer("mqtt.thingspeak.com",1883);
   int PC = PJMC.connect("mqtt.thingspeak.com");
   PJMC.subscribe("channels/1401138/publish/fields/field2/6S31S3WI6UO1EZE6/#");
-  Serial.println(" MQTT Connect: %d", PC);
+  Serial.printf(" MQTT Connect: %d\r\n", PC);
 }
+
+unsigned long long lastMs;
 
 void loop()
 {
@@ -55,8 +57,8 @@ void loop()
     
     Wire.requestFrom(MPU_Address, 2 ,true);
     Tmp = Wire.read() << 8 | Wire.read();
-    tmp = Tmp / 340.000 + 36.53
-    Serial.print(", Tmp = "); Serial.print(tmp);
+    tmp = Tmp / 340.000 + 36.53;
+    Serial.print(" Tmp = "); Serial.println(tmp);
 
     if(i == 0)
     {
@@ -66,7 +68,6 @@ void loop()
       {
         Serial.printf("site OK\n");
         String receivedData = PJHC.getString();
-        //Serial.printf("receivedData : %s\r\n",receivedData.c_str());
         deserializeJson(doc,receivedData);  // 해석 완료
     
         const char* city = doc["name"];
@@ -90,10 +91,9 @@ void loop()
     }
     else
     {
-      Serial.print("AZ = "); Serial.println(z);
-      char AcZbuffer[100];
-      snprintf(AcZbuffer, sizeof(AcZbuffer), "%lf", z);
-      myMQTTClient.publish("channels/1397244/publish/fields/field2/6S31S3WI6UO1EZE6", tmp);
+      char tempb[100];
+      snprintf(tempb, sizeof(tempb), "%lf", tmp);
+      PJMC.publish("channels/1401138/publish/fields/field2/6S31S3WI6UO1EZE6", tmp);
       i = 0;
     }
   }
