@@ -1,7 +1,7 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <PubSubClient.h>
-#include<ArduinoJson.h>
+#include <ArduinoJson.h>
 #include <Wire.h>
 
 #define DELAY_MS  19000
@@ -13,6 +13,7 @@ PubSubClient PJMC;
 int MPU_Address = 0x68; //mpu6050 칩의 I2C 주소
 int16_t Tmp;
 float tmp;
+unsigned long long lastMs = 0;
 int i = 1;
 
 void setup()
@@ -58,7 +59,11 @@ void loop()
     Wire.requestFrom(MPU_Address, 2 ,true);
     Tmp = Wire.read() << 8 | Wire.read();
     tmp = Tmp / 340.000 + 36.53;
+<<<<<<< Updated upstream
     Serial.print(" Tmp = "); Serial.println(tmp);
+=======
+    Serial.print(", Tmp = "); Serial.print(tmp);
+>>>>>>> Stashed changes
 
     if(i == 0)
     {
@@ -91,9 +96,15 @@ void loop()
     }
     else
     {
+<<<<<<< Updated upstream
       char tempb[100];
       snprintf(tempb, sizeof(tempb), "%lf", tmp);
       PJMC.publish("channels/1401138/publish/fields/field2/6S31S3WI6UO1EZE6", tmp);
+=======
+      char tmpb[100];
+      snprintf(tmpb, sizeof(tmpb), "%lf", tmp);
+      PJMC.publish("channels/1397244/publish/fields/field2/6S31S3WI6UO1EZE6", tmp);
+>>>>>>> Stashed changes
       i = 0;
     }
   }
