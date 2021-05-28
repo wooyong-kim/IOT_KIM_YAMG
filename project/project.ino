@@ -44,6 +44,7 @@ void setup()
 }
 
 unsigned long long lastMs;
+DynamicJsonDocument doc(2048);
 
 void loop()
 {
@@ -93,7 +94,7 @@ void loop()
     {
       char tempb[100];
       snprintf(tempb, sizeof(tempb), "%lf", tmp);
-      PJMC.publish("channels/1401138/publish/fields/field2/6S31S3WI6UO1EZE6", tmp);
+      PJMC.publish("channels/1401138/publish/fields/field2/6S31S3WI6UO1EZE6", tempb);
       i = 0;
     }
   }
