@@ -76,7 +76,7 @@ void loop()
         Serial.printf("현재온도 : %.2f\r\n",temp);
         
         char Tmpbuffer[200];
-        snprintf(Tmpbuffer, sizeof(Tmpbuffer), "http://api.thingspeak.com/update?api_key=A5YIWO4Z2OZLAIGK&field2=%lf", temp);
+        snprintf(Tmpbuffer, sizeof(Tmpbuffer), "http://api.thingspeak.com/update?api_key=6S31S3WI6UO1EZE6&field1=%lf", temp);
         PJHC.begin(Tmpbuffer);
         PJHC.GET();
         PJHC.getString();
