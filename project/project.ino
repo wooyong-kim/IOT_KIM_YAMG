@@ -33,7 +33,8 @@ void setup()
   Serial.print("0x");
   Serial.println(a,HEX);
   
-  WiFi.begin("olleh_WiFi_1192","0000008053");
+  //WiFi.begin("olleh_WiFi_1192","0000008053");
+  WiFi.begin("hana202_2_4GHz","0000202ho0000");
   while(WiFi.status() != WL_CONNECTED)
   {
     delay(100);
@@ -101,7 +102,7 @@ void loop()
       PJHC.GET();
       PJHC.getString();
       PJHC.end();
-      Serial.printf(" 외부온도 %s\r\n",Tmpbuffer);
+      
       i = 1;
     }
     else
@@ -110,7 +111,7 @@ void loop()
       snprintf(tempb, sizeof(tempb), "%lf", tmp);
       PJMC.publish("channels/1401138/publish/fields/field2/6S31S3WI6UO1EZE6", tempb);
       i = 0;
-      Serial.printf(" 내부온도 %s\r\n",tempb);
+      Serial.printf("connected : %d\r\n", PJMC.connected());
     }
     PJMC.loop();
   }
