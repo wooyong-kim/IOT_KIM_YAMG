@@ -7,6 +7,7 @@
 #define DELAY_MS  20000
 
 WiFiClient PJWC;
+HTTPClient PJHWC;
 HTTPClient PJHC;
 PubSubClient PJMC;
 
@@ -28,8 +29,9 @@ void setup()
   a = Wire.read();
   Serial.print("0x");
   Serial.println(a,HEX);
-
+  delay(100);
   WiFi.begin("","");
+  
   while(WiFi.status() != WL_CONNECTED)
   {
     delay(100);
@@ -60,8 +62,8 @@ void loop()
     tmp = Tmp / 340.000 + 36.53;
     Serial.print(" Tmp = "); Serial.println(tmp);
 
-    PJHC.begin("http://api.openweathermap.org/data/2.5/weather?q=yongin&appid=e749f72f517350b356969095ff56fd24");
-    int getResult = PJHC.GET();
+    PJHWC.begin("http://api.openweathermap.org/data/2.5/weather?q=yongin&appid=e749f72f517350b356969095ff56fd24");
+    int getResult = PJHWC.GET();
     if(getResult == HTTP_CODE_OK)
     {
       Serial.printf("site OK\n");
@@ -78,21 +80,20 @@ void loop()
       Serial.printf("site ERR, code : %d\r\n",getResult);
       return;
     }
-    PJHC.end();
+    PJHWC.end();
     
     subtmp = tmp - temp;  //내부온도 - 현재온도
-    Serial.printf("%1f\r\n",subtmp);
+    Serial.printf(" 차이 %1f\r\n",subtmp);
     
     if(i == 0)
     {     
-        char Tmpbuffer[200];
-        snprintf(Tmpbuffer, sizeof(Tmpbuffer), "http://api.thingspeak.com/update?api_key=6S31S3WI6UO1EZE6&field1=%lf", temp);
-        PJHC.begin(Tmpbuffer);
-        PJHC.GET();
-        PJHC.getString();
-        PJHC.end();
-      }
-      
+      char Tmpbuffer[200];
+      snprintf(Tmpbuffer, sizeof(Tmpbuffer), "http://api.thingspeak.com/update?api_key=6S31S3WI6UO1EZE6&field1=%lf", temp);
+      PJHC.begin(Tmpbuffer);
+      PJHC.GET();
+      PJHC.getString();
+      PJHC.end();
+      Serial.printf(" 외부온도 %s\r\n",Tmpbuffer);
       i = 1;
     }
     else
@@ -101,6 +102,8 @@ void loop()
       snprintf(tempb, sizeof(tempb), "%lf", tmp);
       PJMC.publish("channels/1401138/publish/fields/field2/6S31S3WI6UO1EZE6", tempb);
       i = 0;
+      Serial.printf(" 내부온도 %s\r\n",tempb);
     }
+  }
   PJMC.loop();
 }
