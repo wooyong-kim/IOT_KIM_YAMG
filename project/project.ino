@@ -104,6 +104,6 @@ void loop()
       i = 0;
       Serial.printf(" 내부온도 %s\r\n",tempb);
     }
+    PJMC.loop();
   }
-  PJMC.loop();
 }
