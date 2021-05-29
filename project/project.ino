@@ -12,6 +12,7 @@ HTTPClient PJHC;
 PubSubClient PJMC;
 
 int MPU_Address = 0x68; //mpu6050 칩의 I2C 주소
+int16_t AcX, AcY, AcZ, GyX, GyY, GyZ;
 int16_t Tmp, a ;
 float tmp, temp, subtmp;
 int i = 1;
@@ -26,12 +27,13 @@ void setup()
   Wire.write(0x6B);
   Wire.write(1);
   Wire.endTransmission(true);
+  delay(1000);
+  Wire.requestFrom(MPU_Address, 14, true);
   a = Wire.read();
   Serial.print("0x");
   Serial.println(a,HEX);
-  delay(100);
-  WiFi.begin("","");
   
+  WiFi.begin("hana202_2_4GHz","0000202ho0000");
   while(WiFi.status() != WL_CONNECTED)
   {
     delay(100);
@@ -57,8 +59,14 @@ void loop()
     Wire.write(0x3B);
     Wire.endTransmission();
     
-    Wire.requestFrom(MPU_Address, 2 ,true);
-    Tmp = Wire.read() << 8 | Wire.read();
+    Wire.requestFrom(MPU_Address, 14 ,true);
+    AcX = Wire.read() << 8|Wire.read();
+    AcY = Wire.read() << 8|Wire.read();
+    AcZ = Wire.read() << 8|Wire.read();
+    Tmp = Wire.read() << 8|Wire.read();
+    GyX = Wire.read() << 8|Wire.read();
+    GyY = Wire.read() << 8|Wire.read();
+    GyZ = Wire.read() << 8|Wire.read();
     tmp = Tmp / 340.000 + 36.53;
     Serial.print(" Tmp = "); Serial.println(tmp);
 
@@ -67,7 +75,7 @@ void loop()
     if(getResult == HTTP_CODE_OK)
     {
       Serial.printf("site OK\n");
-      String receivedData = PJHC.getString();
+      String receivedData = PJHWC.getString();
       deserializeJson(doc,receivedData);  // 해석 완료
   
       const char* city = doc["name"];
