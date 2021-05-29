@@ -107,6 +107,7 @@ void loop()
     }
     else
     {
+      int PC = PJMC.connect("mqtt.thingspeak.com");
       char tempb[100];
       snprintf(tempb, sizeof(tempb), "%lf", tmp);
       PJMC.publish("channels/1401138/publish/fields/field2/6S31S3WI6UO1EZE6", tempb);
