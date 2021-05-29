@@ -1,7 +1,7 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <PubSubClient.h>
-#include<ArduinoJson.h>
+#include <ArduinoJson.h>
 #include <Wire.h>
 
 #define DELAY_MS  20000
@@ -60,21 +60,27 @@ void loop()
     tmp = Tmp / 340.000 + 36.53;
     Serial.print(" Tmp = "); Serial.println(tmp);
 
-    if(i == 0)
+    PJHC.begin("http://api.openweathermap.org/data/2.5/weather?q=yongin&appid=e749f72f517350b356969095ff56fd24");
+    int getResult = PJHC.GET();
+    if(getResult == HTTP_CODE_OK)
     {
-      PJHC.begin("http://api.openweathermap.org/data/2.5/weather?q=yongin&appid=e749f72f517350b356969095ff56fd24");
-      int getResult = PJHC.GET();
-      if(getResult == HTTP_CODE_OK)
-      {
-        Serial.printf("site OK\n");
-        String receivedData = PJHC.getString();
-        deserializeJson(doc,receivedData);  // 해석 완료
-    
-        const char* city = doc["name"];
-        float temp = (float)doc["main"]["temp"]-273.0;
-        Serial.printf("도시 : %s\r\n",city);
-        Serial.printf("현재온도 : %.2f\r\n",temp);
-        
+      Serial.printf("site OK\n");
+      String receivedData = PJHC.getString();
+      deserializeJson(doc,receivedData);  // 해석 완료
+  
+      const char* city = doc["name"];
+      float temp = (float)doc["main"]["temp"]-273.0;
+      Serial.printf("도시 : %s\r\n",city);
+      Serial.printf("현재온도 : %.2f\r\n",temp);
+    }
+    else
+    {
+      Serial.printf("site ERR, code : %d\r\n",getResult);
+      return;
+    }
+
+    if(i == 0)
+    {     
         char Tmpbuffer[200];
         snprintf(Tmpbuffer, sizeof(Tmpbuffer), "http://api.thingspeak.com/update?api_key=6S31S3WI6UO1EZE6&field1=%lf", temp);
         PJHC.begin(Tmpbuffer);
@@ -82,11 +88,7 @@ void loop()
         PJHC.getString();
         PJHC.end();
       }
-      else
-      {
-        Serial.printf("site ERR, code : %d\r\n",getResult);
-        return;
-      }
+      
       i = 1;
     }
     else
