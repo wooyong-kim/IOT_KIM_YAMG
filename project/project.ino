@@ -33,7 +33,7 @@ void setup()
   Serial.print("0x");
   Serial.println(a,HEX);
   
-  WiFi.begin("hana202_2_4GHz","0000202ho0000");
+  WiFi.begin("olleh_WiFi_1192","0000008053");
   while(WiFi.status() != WL_CONNECTED)
   {
     delay(100);
