@@ -12,7 +12,7 @@ PubSubClient PJMC;
 
 int MPU_Address = 0x68; //mpu6050 칩의 I2C 주소
 int16_t Tmp, a ;
-float tmp;
+float tmp, temp, subtmp;
 int i = 1;
 
 void setup()
@@ -29,7 +29,7 @@ void setup()
   Serial.print("0x");
   Serial.println(a,HEX);
 
-  WiFi.begin(" "," ");
+  WiFi.begin("","");
   while(WiFi.status() != WL_CONNECTED)
   {
     delay(100);
@@ -69,16 +69,20 @@ void loop()
       deserializeJson(doc,receivedData);  // 해석 완료
   
       const char* city = doc["name"];
-      float temp = (float)doc["main"]["temp"]-273.0;
+      temp = (float)doc["main"]["temp"]-273.0;
       Serial.printf("도시 : %s\r\n",city);
-      Serial.printf("현재온도 : %.2f\r\n",temp);
+      Serial.printf("현재온도 : %1f\r\n",temp);
     }
     else
     {
       Serial.printf("site ERR, code : %d\r\n",getResult);
       return;
     }
-
+    PJHC.end();
+    
+    subtmp = tmp - temp;  //내부온도 - 현재온도
+    Serial.printf("%1f\r\n",subtmp);
+    
     if(i == 0)
     {     
         char Tmpbuffer[200];
@@ -98,5 +102,5 @@ void loop()
       PJMC.publish("channels/1401138/publish/fields/field2/6S31S3WI6UO1EZE6", tempb);
       i = 0;
     }
-  }
+  PJMC.loop();
 }
