@@ -46,16 +46,11 @@ void fnNotFound(void)
 
 void fnOn(void)
 {
-  if(PJWS.authenticate())
-  {
     char tmpb[200];
     if(motorP == 0) motorP = 1023;
     else motorP = motorP;
     snprintf(tmpb, sizeof(tmpb), "Motor is running as %d", motorP);
     PJWS.send(200, "text/html", tmpb);
-  }
-  else
-    PJWS.requestAuthentication();
  }
 
  void fnInput(void)
@@ -109,7 +104,7 @@ void setup()
   PJWS.onNotFound(fnNotFound);
   PJWS.begin();
 
-  send_webhook("IP","",WiFi.localIP().toString().c_str(),"","");
+  //send_webhook("IP","",WiFi.localIP().toString().c_str(),"","");
 }
 
 unsigned long long lastMs = 0;
@@ -162,7 +157,8 @@ void loop()
         motorP = 950;
       else if(abs(subtmp) - Tmpd >= 15)
         motorP = 1023;
-      else motorp = 800;
+      else 
+        motorP = 800;
     }
     else motorP = 0;
     //Serial.printf(" 차이 %1f\r\n",subtmp);
