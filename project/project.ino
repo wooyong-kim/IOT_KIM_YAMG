@@ -3,25 +3,81 @@
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 #include <Wire.h>
+#include <ESP8266WebServer.h>
+#include <AnotherIFTTTWebhook.h>
 
 #define DELAY_MS  20000
+#define MOTOR     D5
 
 WiFiClient PJWC;
 HTTPClient PJHWC;
 HTTPClient PJHC;
 PubSubClient PJMC;
+ESP8266WebServer PJWS(80);
 
 int MPU_Address = 0x68; //mpu6050 칩의 I2C 주소
 int16_t AcX, AcY, AcZ, GyX, GyY, GyZ;
 int16_t Tmp, a ;
-float tmp, temp, subtmp;
+float tmp, temp, subtmp, Tmpd;
 int i = 1;
+char tmpd [200];
+int motorP = 0;
+
+
+void fnroot(void)
+{
+  char tmpb[2000];
+  char IP[200];
+  char Tmp[200];
+  strcpy (tmpb, "<html>\r\n");
+  strcat (tmpb, "IOT Project <br>\r\n");
+  strcat (tmpb, "<a href=/on>Rotate Motor</a><br>\r\n");
+  strcat (tmpb, "<form method=\"get\" action=\"input\">");
+  strcat (tmpb, "Motor <input type=\"text\" name=\"tmp\">");
+  strcat (tmpb, "<input type=\"submit\"></form>\r\n");
+  snprintf (tmpb, sizeof(tmpb), "%s%s", tmpb, "</html>");
+  aServer.send(200,"text/html", tmpb);
+}
+
+void fnNotFound(void)
+{
+  aServer.send(404, "text/html", "WRONG!!");
+}
+
+void fnOn(void)
+{
+  if(aServer.authenticate())
+  {
+    char tmpb[200];
+    if(motorP == 0) motorP = 1023;
+    else motorP = motorP;
+    snprintf(tmpb, sizeof(tmpb), "Motor is running as %d", motorP);
+    aServer.send(200, "text/html", tmpb);
+  }
+  else
+    aServer.requestAuthentication();
+ }
+
+ void fnInput(void)
+ {
+  if(aServer.hasArg("tmp"))
+  {
+    strcpy(tmpd, "<meta charset=utf-8>");
+    strcat(tmpd, aServer.arg("tmp").c_str());
+    Tmpd = atoi(aServer.arg("tmp").c_str());
+
+    aServer.send(200, "text/html", tmpd);
+  }
+  else
+    aServer.send(200, "text/html", "Something Wrong!");
+}
+
 
 void setup()
 { 
   Serial.begin(115200);
   delay(100);
-  
+  pinMode(MOTOR,OUTPUT);
   Wire.begin(4,5);
   Wire.beginTransmission(MPU_Address);
   Wire.write(0x6B);
@@ -46,6 +102,14 @@ void setup()
   int PC = PJMC.connect("mqtt.thingspeak.com");
   PJMC.subscribe("channels/1401138/publish/fields/field2/6S31S3WI6UO1EZE6/#");
   Serial.printf(" MQTT Connect: %d\r\n", PC);
+
+  PJWS.on("/",fnroot);
+  PJWS.on("/on",fnOn);
+  PJWS.on("/input",fnInput);
+  PJWS.onNotFound(fnNotFound);
+  PJWS.begin();
+
+  send_webhook("IP","",WiFi.localIP().toString().c_str(),"","");
 }
 
 unsigned long long lastMs = 0;
@@ -69,7 +133,7 @@ void loop()
     GyY = Wire.read() << 8|Wire.read();
     GyZ = Wire.read() << 8|Wire.read();
     tmp = Tmp / 340.000 + 36.53;
-    Serial.print(" Tmp = "); Serial.println(tmp);
+    //Serial.print(" Tmp = "); Serial.println(tmp);
 
     PJHWC.begin("http://api.openweathermap.org/data/2.5/weather?q=yongin&appid=e749f72f517350b356969095ff56fd24");
     int getResult = PJHWC.GET();
@@ -81,8 +145,8 @@ void loop()
   
       const char* city = doc["name"];
       temp = (float)doc["main"]["temp"]-273.0;
-      Serial.printf("도시 : %s\r\n",city);
-      Serial.printf("현재온도 : %1f\r\n",temp);
+      //Serial.printf("도시 : %s\r\n",city);
+      //Serial.printf("현재온도 : %1f\r\n",temp);
     }
     else
     {
@@ -92,7 +156,8 @@ void loop()
     PJHWC.end();
     
     subtmp = tmp - temp;  //내부온도 - 현재온도
-    Serial.printf(" 차이 %1f\r\n",subtmp);
+    if (subtmp == 
+    //Serial.printf(" 차이 %1f\r\n",subtmp);
     
     if(i == 0)
     {     
@@ -116,4 +181,5 @@ void loop()
     }
     PJMC.loop();
   }
+  PJWS.handleClient();
 }
