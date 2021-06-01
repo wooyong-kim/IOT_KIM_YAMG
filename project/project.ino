@@ -156,7 +156,15 @@ void loop()
     PJHWC.end();
     
     subtmp = tmp - temp;  //내부온도 - 현재온도
-    if (subtmp == 
+    if (abs(subtmp) >= Tmpd )
+    {
+      if(abs(subtmp) - Tmpd >= 10 && abs(subtmp) - Tmpd < 15) 
+        motorP = 950;
+      else if(abs(subtmp) - Tmpd >= 15)
+        motorP = 1023;
+      else motorp = 800;
+    }
+    else motorP = 0;
     //Serial.printf(" 차이 %1f\r\n",subtmp);
     
     if(i == 0)
@@ -181,5 +189,8 @@ void loop()
     }
     PJMC.loop();
   }
+  
+  analogWrite(MOTOR,motorP);
+  
   PJWS.handleClient();
 }
