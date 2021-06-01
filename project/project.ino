@@ -31,9 +31,9 @@ void fnroot(void)
   char Tmp[200];
   strcpy (tmpb, "<html>\r\n");
   strcat (tmpb, "IOT Project <br>\r\n");
-  strcat (tmpb, "<a href=/on>Temperature Different</a><br>\r\n");
+  strcat (tmpb, "<a href=/Temperature Different>Temperature Different</a><br>\r\n");
   strcat (tmpb, "<form method=\"get\" action=\"input\">");
-  strcat (tmpb, "Motor <input type=\"text\" name=\"tmp\">");
+  strcat (tmpb, "TD <input type=\"text\" name=\"tmp\">");
   strcat (tmpb, "<input type=\"submit\"></form>\r\n");
   snprintf (tmpb, sizeof(tmpb), "%s%s", tmpb, "</html>");
   PJWS.send(200,"text/html", tmpb);
@@ -97,7 +97,7 @@ void setup()
   Serial.printf(" MQTT Connect: %d\r\n", PC);
 
   PJWS.on("/",fnroot);
-  PJWS.on("/on",fnOn);
+  PJWS.on("/Temperature Different",fnOn);
   PJWS.on("/input",fnInput);
   PJWS.onNotFound(fnNotFound);
   PJWS.begin();
