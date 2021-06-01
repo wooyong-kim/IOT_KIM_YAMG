@@ -31,7 +31,7 @@ void fnroot(void)
   char Tmp[200];
   strcpy (tmpb, "<html>\r\n");
   strcat (tmpb, "IOT Project <br>\r\n");
-  strcat (tmpb, "<a href=/on>Rotate Motor</a><br>\r\n");
+  strcat (tmpb, "<a href=/on>Temperature Different</a><br>\r\n");
   strcat (tmpb, "<form method=\"get\" action=\"input\">");
   strcat (tmpb, "Motor <input type=\"text\" name=\"tmp\">");
   strcat (tmpb, "<input type=\"submit\"></form>\r\n");
@@ -47,9 +47,7 @@ void fnNotFound(void)
 void fnOn(void)
 {
     char tmpb[200];
-    if(motorP == 0) motorP = 1023;
-    else motorP = motorP;
-    snprintf(tmpb, sizeof(tmpb), "Motor is running as %d", motorP);
+    snprintf(tmpb, sizeof(tmpb), "설정된 온도 차 %d", Tmpd);
     PJWS.send(200, "text/html", tmpb);
  }
 
@@ -104,7 +102,7 @@ void setup()
   PJWS.onNotFound(fnNotFound);
   PJWS.begin();
 
-  //send_webhook("IP","",WiFi.localIP().toString().c_str(),"","");
+  send_webhook("IOT_KIM_YAMG","dZ-52Zgk8CnPCeC_15A2T8",WiFi.localIP().toString().c_str(),"","");
 }
 
 unsigned long long lastMs = 0;
@@ -151,11 +149,11 @@ void loop()
     PJHWC.end();
     
     subtmp = tmp - temp;  //내부온도 - 현재온도
-    if (abs(subtmp) >= Tmpd )
+    if (abs(subtmp) >= Tmpd ) 
     {
-      if(abs(subtmp) - Tmpd >= 10 && abs(subtmp) - Tmpd < 15) 
+      if(abs(abs(subtmp) - Tmpd) >= 10 && abs(abs(subtmp) - Tmpd) < 15) 
         motorP = 950;
-      else if(abs(subtmp) - Tmpd >= 15)
+      else if(abs(abs(subtmp) - Tmpd) >= 15)
         motorP = 1023;
       else 
         motorP = 800;
