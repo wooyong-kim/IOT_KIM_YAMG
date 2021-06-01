@@ -36,40 +36,40 @@ void fnroot(void)
   strcat (tmpb, "Motor <input type=\"text\" name=\"tmp\">");
   strcat (tmpb, "<input type=\"submit\"></form>\r\n");
   snprintf (tmpb, sizeof(tmpb), "%s%s", tmpb, "</html>");
-  aServer.send(200,"text/html", tmpb);
+  PJWS.send(200,"text/html", tmpb);
 }
 
 void fnNotFound(void)
 {
-  aServer.send(404, "text/html", "WRONG!!");
+  PJWS.send(404, "text/html", "WRONG!!");
 }
 
 void fnOn(void)
 {
-  if(aServer.authenticate())
+  if(PJWS.authenticate())
   {
     char tmpb[200];
     if(motorP == 0) motorP = 1023;
     else motorP = motorP;
     snprintf(tmpb, sizeof(tmpb), "Motor is running as %d", motorP);
-    aServer.send(200, "text/html", tmpb);
+    PJWS.send(200, "text/html", tmpb);
   }
   else
-    aServer.requestAuthentication();
+    PJWS.requestAuthentication();
  }
 
  void fnInput(void)
  {
-  if(aServer.hasArg("tmp"))
+  if(PJWS.hasArg("tmp"))
   {
     strcpy(tmpd, "<meta charset=utf-8>");
-    strcat(tmpd, aServer.arg("tmp").c_str());
-    Tmpd = atoi(aServer.arg("tmp").c_str());
+    strcat(tmpd, PJWS.arg("tmp").c_str());
+    Tmpd = atoi(PJWS.arg("tmp").c_str());
 
-    aServer.send(200, "text/html", tmpd);
+    PJWS.send(200, "text/html", tmpd);
   }
   else
-    aServer.send(200, "text/html", "Something Wrong!");
+    PJWS.send(200, "text/html", "Something Wrong!");
 }
 
 
