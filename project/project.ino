@@ -18,7 +18,8 @@ ESP8266WebServer PJWS(80);
 int MPU_Address = 0x68; //mpu6050 칩의 I2C 주소
 int16_t AcX, AcY, AcZ, GyX, GyY, GyZ;
 int16_t Tmp, a ;
-float tmp, temp, subtmp, Tmpd;
+float tmp, temp, subtmp ;
+float Tmpd = 5;
 int i = 1;
 char tmpd [200];
 int motorP = 0;
@@ -31,9 +32,9 @@ void fnroot(void)
   char Tmp[200];
   strcpy (tmpb, "<html>\r\n");
   strcat (tmpb, "IOT Project <br>\r\n");
-  strcat (tmpb, "<a href=/on>Temperature Different</a><br>\r\n");
+  strcat (tmpb, "<a href=/Temperature Different>Temperature Different</a><br>\r\n");
   strcat (tmpb, "<form method=\"get\" action=\"input\">");
-  strcat (tmpb, "Motor <input type=\"text\" name=\"tmp\">");
+  strcat (tmpb, "TD <input type=\"text\" name=\"tmp\">");
   strcat (tmpb, "<input type=\"submit\"></form>\r\n");
   snprintf (tmpb, sizeof(tmpb), "%s%s", tmpb, "</html>");
   PJWS.send(200,"text/html", tmpb);
@@ -47,7 +48,7 @@ void fnNotFound(void)
 void fnOn(void)
 {
     char tmpb[200];
-    snprintf(tmpb, sizeof(tmpb), "설정된 온도 차 %d", Tmpd);
+    snprintf(tmpb, sizeof(tmpb), "Temperature Different %d", Tmpd);
     PJWS.send(200, "text/html", tmpb);
  }
 
@@ -97,7 +98,7 @@ void setup()
   Serial.printf(" MQTT Connect: %d\r\n", PC);
 
   PJWS.on("/",fnroot);
-  PJWS.on("/on",fnOn);
+  PJWS.on("/Temperature Different",fnOn);
   PJWS.on("/input",fnInput);
   PJWS.onNotFound(fnNotFound);
   PJWS.begin();
