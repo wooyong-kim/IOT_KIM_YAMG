@@ -30,10 +30,11 @@ void fnroot(void)
   char IP[200];
   char Tmp[200];
   strcpy (tmpb, "<html>\r\n");
+  strcpy(tmpb, "<meta charset=utf-8>");
   strcat (tmpb, "IOT Project <br>\r\n");
   strcat (tmpb, "<a href=/Temperature Different>Temperature Different</a><br>\r\n");
   strcat (tmpb, "<form method=\"get\" action=\"input\">");
-  strcat (tmpb, "TD <input type=\"text\" name=\"tmp\">");
+  strcat (tmpb, "기준값 설정 <input type=\"text\" name=\"tmp\">");
   strcat (tmpb, "<input type=\"submit\"></form>\r\n");
   snprintf (tmpb, sizeof(tmpb), "%s%s", tmpb, "</html>");
   PJWS.send(200,"text/html", tmpb);
@@ -82,8 +83,8 @@ void setup()
   Serial.print("0x");
   Serial.println(a,HEX);
   
-  //WiFi.begin("olleh_WiFi_1192","0000008053");
-  WiFi.begin("hana202_2_4GHz","0000202ho0000");
+  WiFi.begin("olleh_WiFi_1192","0000008053");
+  //WiFi.begin("hana202_2_4GHz","0000202ho0000");
   while(WiFi.status() != WL_CONNECTED)
   {
     delay(100);
