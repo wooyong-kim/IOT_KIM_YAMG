@@ -29,10 +29,15 @@ void fnroot(void)
 {
   char tmpb[2000];
   char IP[200];
-  char Tmp[200];
+  char Tmp1[200];
+  char Tmp2[200];
   strcpy (tmpb, "<html>\r\n");
-  strcpy (tmpb, "<meta charset=utf-8>");
+  strcpy(tmpb, "<meta charset=utf-8>");
   strcat (tmpb, "IOT Project <br>\r\n");
+  snprintf(Tmp1, sizeof(Tmp1),"현재 외부 온도 : %.1f <br>\r\n",temp);
+  strcat(tmpb, Tmp1);
+  snprintf(Tmp2, sizeof(Tmp2),"현재 내부 온도 : %.1f <br>\r\n",tmp);
+  strcat(tmpb, Tmp2);
   strcat (tmpb, "<a href=/Temperature>현재 기준값</a><br>\r\n");
   strcat (tmpb, "<form method=\"get\" action=\"input\">");
   strcat (tmpb, "기준값 설정 <input type=\"text\" name=\"tmp\">");
@@ -48,9 +53,10 @@ void fnNotFound(void)
 
 void fnOn(void)
 {
-    char tmpc[200];
-    snprintf(tmpc, sizeof(tmpc), "%.lf", Tmpd);
-    PJWS.send(200, "text/html", tmpc);
+    char tmpb[200];
+    strcpy(tmpb, "<meta charset=utf-8>");
+    snprintf(tmpb, sizeof(tmpb), "%1.f", Tmpd);
+    PJWS.send(200, "text/html", tmpb);
  }
 
  void fnInput(void)
